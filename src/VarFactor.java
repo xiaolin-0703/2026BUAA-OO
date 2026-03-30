@@ -8,12 +8,8 @@ public class VarFactor implements Factor {
         element = input;
     }
 
-    public String toString() {
-        return element;
-    }
-
     public Poly toPoly() {
-        Mono newMono = new Mono(BigInteger.ONE,1);
+        Mono newMono = new Mono(BigInteger.ONE,BigInteger.ONE,null);
         Poly poly = new Poly();
         poly.addMono(newMono);
         return poly;

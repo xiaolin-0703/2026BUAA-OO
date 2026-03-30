@@ -7,14 +7,16 @@ public class NumFactor implements Factor {
         this.num = num;
     }
 
-    public String toString() {
-        return this.num.toString();
-    }
-
     public Poly toPoly() {
-        Mono mono = new Mono(num,0);
+        Mono mono = new Mono(num,BigInteger.ZERO,null);
         Poly poly = new Poly();
         poly.addMono(mono);
         return poly;
     }
+
+    @Override
+    public String toString() {
+        return num.toString();
+    }
+
 }

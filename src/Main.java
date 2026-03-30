@@ -5,21 +5,37 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
+        FunDef fun;
+        int n =  sc.nextInt();
+        sc.nextLine();
+        if (n == 1) {
+            String inputfun = sc.nextLine();
+            fun = new FunDef(inputfun);
+        } else {
+            fun = new FunDef("f(x) = x");
+        }
+
+        String outputFun = fun.getOutputFun();
+
+        String input =  sc.nextLine();
 
         Process process = new Process(input);
-        Lexer lexer = new Lexer(process.getOutput());
+
+        Lexer lexer = new Lexer(process.getOutput(),outputFun);
 
         Prase prase = new Prase(lexer);
 
         ExprFactor expr = prase.praseExpr();
 
-        Poly midResult = expr.toPoly();
+        Poly poly = expr.toPoly();
 
-        DealResult dealResult = new DealResult(midResult);
+        DealResult dealResult = new DealResult(poly);
 
         String result = dealResult.getResult();
 
+        if (result.charAt(0) == '+') {
+            result = result.substring(1);
+        }
         System.out.println(result);
     }
 }

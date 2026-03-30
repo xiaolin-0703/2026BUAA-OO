@@ -15,7 +15,6 @@ public class Process {
         } else {
             dealString1 = dealString;
         }
-        boolean flag = true;
 
         while (dealString1.contains("++") || dealString1.contains("--")
             || dealString1.contains("+-") || dealString1.contains("-+")) {
@@ -31,7 +30,12 @@ public class Process {
         dealString1 = dealString1.replace("*-", "*(0-1)*");
         dealString1 = dealString1.replace("(+", "(0+");
         dealString1 = dealString1.replace("(-", "(0-");
-
+        dealString1 = dealString1.replace("=-", "=0-");
+        dealString1 = dealString1.replace("=+", "=0+");
+        dealString1 = dealString1.replace(":+", ":0+");
+        dealString1 = dealString1.replace(":-", ":0-");
+        dealString1 = dealString1.replace("?-", "?0-");
+        dealString1 = dealString1.replace("?+", "?0+");
         return dealString1;
     }
 

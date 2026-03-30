@@ -35,10 +35,8 @@ public class ExprFactor implements Factor {
         for (int i = 0;i < operators.size();i++) {
             Poly p = terms.get(i + 1).toPoly();
             for (Mono mono : p.getMonos()) {
-                if (operators.get(i).getContent().equals("+")) {
-                    mono.mergeSign(1);
-                } else if (operators.get(i).getContent().equals("-")) {
-                    mono.mergeSign(-1);
+                if (operators.get(i).getContent().equals("-")) {
+                    mono.negateMono();
                 }
             }
             poly.addPoly(p);
