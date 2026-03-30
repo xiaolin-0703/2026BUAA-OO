@@ -32,35 +32,38 @@ public class Poly {
     }
 
     public Poly mulPoly(Poly poly1) {
-        ArrayList<Mono> monos1 = new ArrayList<>();
+        Poly result = new Poly();
         for (Mono op1 : this.monos) {
             for (Mono op2 : poly1.getMonos()) {
                 Mono newMono = op1.mulMono(op2);
-                monos1.add(newMono);
+                result.addMono(newMono);
             }
         }
-        monos.clear();
-        monos.addAll(monos1);
-        Poly poly2 = this.standardPoly();
-        monos.clear();
-        monos.addAll(poly2.getMonos());
-        return poly2;
+        return result.standardPoly();
     }
 
-    public void exPoly(int exp) {
-        ArrayList<Mono> monos1 = new ArrayList<>();
-        if (exp == 0) {
-            Mono newMono = new Mono(BigInteger.ONE,BigInteger.ZERO,null);
-            monos.clear();
-            monos.add(newMono);
-            return;
+    public Poly substitute(Poly xreplacement) {
+        Poly result = new Poly();
+        for (Mono m : this.monos) {
+            result.addPoly(m.substitute(xreplacement));
         }
-        Poly poly1 = new Poly();
-        poly1.monos.addAll(this.monos);
-        for (int i = 1;i < exp;i++) {
-            this.mulPoly(poly1);
-        }
+        return result.standardPoly();
+    }
 
+    public Poly power(BigInteger exp) {
+        Poly res = new Poly();
+        res.addMono(new Mono(BigInteger.ONE, BigInteger.ZERO, BigInteger.ZERO, null));
+        Poly base = this.standardPoly();
+        BigInteger e = exp;
+        if (e.compareTo(BigInteger.ONE) == 0) { return base; }
+        while (e.compareTo(BigInteger.ZERO) > 0) {
+            if (e.mod(new BigInteger("2")).equals(BigInteger.ONE)) {
+                res = res.mulPoly(base);
+            }
+            base = base.mulPoly(base);
+            e = e.divide(new BigInteger("2"));
+        }
+        return res;
     }
 
     public Poly negatePoly() {
@@ -68,6 +71,14 @@ public class Poly {
             op.negateMono();
         }
         return this;
+    }
+
+    public Poly DerPoly(String var) {
+        Poly result = new Poly();
+        for (Mono m : this.monos) {
+            result.addPoly(m.Dermono(var));
+        }
+        return result.standardPoly();
     }
 
     @Override
@@ -93,20 +104,25 @@ public class Poly {
                     innerStandard = null;
                 }
             }
-            MonoExp key = new MonoExp(m.getExponent(), innerStandard);
+            MonoExp key = new MonoExp(m.getExponent(), m.getYexponent(),innerStandard);
             map.put(key, map.getOrDefault(key, BigInteger.ZERO).add(m.getCoefficient()));
         }
         ArrayList<Mono> sortedList = new ArrayList<>();
         for (Map.Entry<MonoExp, BigInteger> entry : map.entrySet()) {
             if (!entry.getValue().equals(BigInteger.ZERO)) {
                 sortedList.add(new Mono(entry.getValue(),
-                        entry.getKey().getxExponent(), entry.getKey().getExpoly()));
+                        entry.getKey().getxExponent(),
+                        entry.getKey().getyExponent(),entry.getKey().getExpoly()));
             }
         }
         sortedList.sort((a, b) -> {
             int xcomp = a.getExponent().compareTo(b.getExponent());
             if (xcomp != 0) {
                 return xcomp;
+            }
+            int ycomp = a.getYexponent().compareTo(b.getYexponent());
+            if (ycomp != 0) {
+                return ycomp;
             }
             String s1 = (a.getExpoly() == null) ? "" : a.getExpoly().toString();
             String s2 = (b.getExpoly() == null) ? "" : b.getExpoly().toString();

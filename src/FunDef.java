@@ -11,7 +11,9 @@ public class FunDef {
         String [] str = inputFun.split("=");
         outputFun = str[1];
         Process process = new Process(outputFun);
-        outputFun = process.getOutput();
+        Lexer lexer = new Lexer(process.getOutput());
+        Poly fun = new Prase(lexer).praseExpr().toPoly().standardPoly();
+        RegisterFun.registernorFun(fun);
     }
 
     public String getOutputFun() {

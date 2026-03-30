@@ -3,10 +3,8 @@ import java.util.ArrayList;
 public class Lexer {
     private final ArrayList<Token> tokens = new ArrayList<>();
     private int cur = 0;
-    private String fun;
 
-    public Lexer(String input, String fun) {
-        this.fun = fun;
+    public Lexer(String input) {
         lexString(input);
     }
 
@@ -22,50 +20,34 @@ public class Lexer {
                 }
                 tokens.add(new Token(sb.toString()));
             } else if (c == 'e') {
-                tokens.add(new Token("e"));
+                tokens.add(new Token("exp"));
                 pos += 3;
             } else if (c == 'f') {
-                pos += 2;
-                int count = 1;
-                int start = pos;
-                while (pos < text.length() && count > 0) {
-                    if (text.charAt(pos) == '(') {
-                        count++;
-                    }
-                    else if (text.charAt(pos) == ')') {
-                        count--;
-                    }
-                    pos++;
+                pos++;
+                char c1 = text.charAt(pos);
+                if (c1 == '(') {
+                    tokens.add(new Token("f"));
+                } else if (c1 == '{') {
+                    tokens.add(new Token("refun"));//将递推函数用refun表示
                 }
-                String arg = text.substring(start, pos - 1);
-                String expanded = substitute(fun, arg);
-
-                lexString("(" + expanded + ")");
-            } else {
+            } else if (c == 'g') {
+                tokens.add(new Token("grad"));
+                pos += 4;
+            } else if (c == 'd') {
+                pos++;
+                char c1 = text.charAt(pos);
+                if (c1 == 'x') {
+                    tokens.add(new Token("dx"));
+                } else {
+                    tokens.add(new Token("dy"));
+                }
+                pos++;
+            }
+            else {
                 tokens.add(new Token(String.valueOf(c)));
                 pos++;
             }
         }
-    }
-
-    private String substitute(String funDef, String arg) {
-        StringBuilder sb = new StringBuilder();
-        int k = 0;
-        while (k < funDef.length()) {
-            char c = funDef.charAt(k);
-            if (c == 'e' && k + 2 < funDef.length() && funDef.charAt(k + 1) == 'x'
-                    && funDef.charAt(k + 2) == 'p') {
-                sb.append("exp");
-                k += 3;
-            } else if (c == 'x') {
-                sb.append("(").append(arg).append(")");
-                k++;
-            } else {
-                sb.append(c);
-                k++;
-            }
-        }
-        return sb.toString();
     }
 
     public void next() { cur += 1; }

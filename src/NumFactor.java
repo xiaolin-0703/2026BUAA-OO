@@ -8,7 +8,7 @@ public class NumFactor implements Factor {
     }
 
     public Poly toPoly() {
-        Mono mono = new Mono(num,BigInteger.ZERO,null);
+        Mono mono = new Mono(num,BigInteger.ZERO,BigInteger.ZERO,null);
         Poly poly = new Poly();
         poly.addMono(mono);
         return poly;

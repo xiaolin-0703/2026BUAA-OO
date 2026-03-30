@@ -20,7 +20,7 @@ public class CellFactor implements Factor {
         Poly newPoly = new Poly();
         BigInteger exp = new BigInteger(factors.get(1).toString());
         if (exp.compareTo(BigInteger.ZERO) == 0) {
-            newPoly.addMono(new Mono(BigInteger.ONE,BigInteger.ZERO,null));
+            newPoly.addMono(new Mono(BigInteger.ONE,BigInteger.ZERO,BigInteger.ZERO,null));
             return newPoly;
         }
         Poly poly1 = factors.get(0).toPoly();
@@ -35,9 +35,10 @@ public class CellFactor implements Factor {
 
     public Poly power(Poly base, BigInteger exp) {
         Poly res = new Poly();
-        res.addMono(new Mono(BigInteger.ONE, BigInteger.ZERO, null));
+        res.addMono(new Mono(BigInteger.ONE, BigInteger.ZERO, BigInteger.ZERO,null));
         Poly b = base;
         BigInteger e = exp;
+        if (e.compareTo(BigInteger.ONE) == 0) { return b; }
         while (e.compareTo(BigInteger.ZERO) > 0) {
             if (e.mod(new BigInteger("2")).equals(BigInteger.ONE)) {
                 res = res.mulPoly(b);

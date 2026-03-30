@@ -8,7 +8,7 @@ public class Exp implements Factor {
     }
 
     public Poly toPoly() {
-        Mono mono = new Mono(BigInteger.ONE,BigInteger.ZERO,factor.toPoly());
+        Mono mono = new Mono(BigInteger.ONE,BigInteger.ZERO,BigInteger.ZERO,factor.toPoly());
         Poly poly1 = new Poly();
         poly1.addMono(mono);
         return poly1;

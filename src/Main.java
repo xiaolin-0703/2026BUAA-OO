@@ -14,25 +14,23 @@ public class Main {
         } else {
             fun = new FunDef("f(x) = x");
         }
-
-        String outputFun = fun.getOutputFun();
-
+        int m =  sc.nextInt();
+        sc.nextLine();
+        String [] recurFun  = new String[4];
+        for (int i = 0; i < 3 * m; i++) {
+            recurFun[i] = sc.nextLine();
+        }
+        if (m > 0) {
+            new DealRefun(recurFun[0],recurFun[1],recurFun[2]);
+        }
         String input =  sc.nextLine();
-
         Process process = new Process(input);
-
-        Lexer lexer = new Lexer(process.getOutput(),outputFun);
-
+        Lexer lexer = new Lexer(process.getOutput());
         Prase prase = new Prase(lexer);
-
         ExprFactor expr = prase.praseExpr();
-
         Poly poly = expr.toPoly();
-
         DealResult dealResult = new DealResult(poly);
-
         String result = dealResult.getResult();
-
         if (result.charAt(0) == '+') {
             result = result.substring(1);
         }

@@ -15,7 +15,7 @@ public class Term {
         Poly poly = new Poly();
         poly.addPoly(factors.get(0).toPoly());
         for (int i = 1;i < factors.size();i++) {
-            poly.mulPoly(factors.get(i).toPoly());
+            poly = poly.mulPoly(factors.get(i).toPoly());
         }
         return poly;
     }
