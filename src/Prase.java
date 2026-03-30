@@ -33,15 +33,14 @@ public class Prase {
 
     public CellFactor praseCell() {
         CellFactor cell = new CellFactor();
-        cell.addFactor(praseFactor());
+        Factor factor = praseFactor();
+        cell.addFactor(factor);
         boolean flag = false;
-
         while (lexer.notEmpty() && lexer.peek().getContent().equals("^")) {
             lexer.next();
             flag = true;
             cell.addFactor(praseFactor());
         }
-
         if (!flag) {
             cell.addFactor(new NumFactor(new BigInteger("1")));
         }
@@ -58,7 +57,28 @@ public class Prase {
             ExprFactor expr = praseExpr();
             lexer.next();
             return expr;
-        } else {
+        } else if (lexer.peek().getContent().equals("e")) {
+            lexer.next();
+            lexer.next();//跳过'('
+            ExprFactor factor = praseExpr();
+            lexer.next();//跳过‘）’
+            return new Exp(factor);
+        } else if (lexer.peek().getContent().equals("[")) {
+            lexer.next();
+            lexer.next();//skip '('
+            final ExprFactor factorA = praseExpr();
+            lexer.next();
+            lexer.next();//skip'=='
+            final ExprFactor factorB = praseExpr();
+            lexer.next();//skip ')'
+            lexer.next();//skip'?'
+            ExprFactor factorC = praseExpr();
+            lexer.next();//skip ':'
+            ExprFactor factorD = praseExpr();
+            lexer.next();//skip ']'
+            return new ChoiceFactor(factorA, factorB, factorC, factorD);
+        }
+        else {
             NumFactor num = new NumFactor(new BigInteger(lexer.peek().getContent()));
             lexer.next();
             return num;

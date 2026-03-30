@@ -1,5 +1,5 @@
 public interface Factor {
-    String toString();
-
     Poly toPoly();
+
+    String toString();
 }
