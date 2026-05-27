@@ -3,7 +3,7 @@
 // (powered by Fernflower decompiler)
 //
 
-import com.oocourse.elevator2.PersonRequest;
+import com.oocourse.elevator3.PersonRequest;
 
 public class EleState {
     private int curFloor;
@@ -13,8 +13,9 @@ public class EleState {
     private int inSize;
     private Stage stage;
     private boolean isIdle;
+    private int id;
 
-    public EleState(int curFloor, int direction, int curWeight, int waitSize,
+    public EleState(int id,int curFloor, int direction, int curWeight, int waitSize,
                     int inSIze, Stage stage, boolean isIdle) {
         this.curFloor = curFloor;
         this.direction = direction;
@@ -23,6 +24,7 @@ public class EleState {
         this.inSize = inSIze;
         this.stage = stage;
         this.isIdle = isIdle;
+        this.id = id;
     }
 
     public int getInSize() {
@@ -34,13 +36,38 @@ public class EleState {
     }
 
     public double calScore(PersonRequest p) {
-        if (this.stage != Stage.NORMAL || this.waitSize > 5) {
+        final int from = this.intFloor(p.getFromFloor());
+        final int to = this.intFloor(p.getToFloor());
+
+        Stage evalStage = this.stage;
+        if (this.id <= 6 && (evalStage == Stage.REC_ACCEPT || evalStage == Stage.RECYCLE)) {
+            evalStage = Stage.DOUBLE;
+        }
+        if (this.stage == Stage.REC_ACCEPT && this.id > 6) {
+            return Double.MAX_VALUE;
+        }
+        if (this.stage == Stage.REP_ACCEPT && this.id <= 6) {
+            return Double.MAX_VALUE;
+        }
+        if (this.stage == Stage.UP_ACCEPT && this.id <= 6) {
+            return Double.MAX_VALUE;
+        }
+
+        if (evalStage == Stage.DOUBLE || evalStage == Stage.REC_ACCEPT) {
+            if (this.id <= 6 && (from < 2 || (from == 2 && to < 2))) { return Double.MAX_VALUE; }
+            if (this.id > 6 && (from > 2 || (from == 2 && to > 2))) { return Double.MAX_VALUE; }
+        }
+
+        if (this.id > 6 && (this.stage == Stage.NORMAL || this.stage == Stage.UP_ACCEPT
+                || this.stage == Stage.UPDATE)) {
+            return Double.MAX_VALUE;
+        }
+
+        if ((evalStage != Stage.NORMAL && evalStage != Stage.DOUBLE) || this.waitSize > 5) {
             return Double.MAX_VALUE;
         } else if (this.curWeight + p.getWeight() > 400) {
-            return Double.MAX_VALUE - 100;
+            return 100000.0;
         } else {
-            int from = this.intFloor(p.getFromFloor());
-            int to = this.intFloor(p.getToFloor());
             int reqDir = to > from ? 1 : -1;
             double score = (double)Math.abs(this.floorRank(this.curFloor) -
                     this.floorRank(from)) * (double)10.0F;

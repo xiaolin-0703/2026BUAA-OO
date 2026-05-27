@@ -3,7 +3,7 @@
 // (powered by Fernflower decompiler)
 //
 
-import com.oocourse.elevator2.Request;
+import com.oocourse.elevator3.Request;
 import java.util.ArrayList;
 
 public class InputQueue {

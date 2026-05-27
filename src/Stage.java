@@ -7,7 +7,13 @@ public enum Stage {
     NORMAL,
     REP_ACCEPT,
     REPAIR,
-    TEST;
+    TEST,
+
+    UP_ACCEPT,
+    UPDATE,
+    DOUBLE,
+    REC_ACCEPT,
+    RECYCLE;
 
     public Stage next() {
         Stage[] all = values();

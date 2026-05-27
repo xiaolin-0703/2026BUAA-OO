@@ -3,14 +3,20 @@
 // (powered by Fernflower decompiler)
 //
 
-import com.oocourse.elevator2.MaintRequest;
-import com.oocourse.elevator2.PersonRequest;
+import com.oocourse.elevator3.MaintRequest;
+import com.oocourse.elevator3.PersonRequest;
+import com.oocourse.elevator3.RecycleRequest;
+import com.oocourse.elevator3.UpdateRequest;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class EleQueue {
     private ArrayList<PersonRequest> waitPersons = new ArrayList();
     private MaintRequest maintRequest = null;
+    private UpdateRequest updateRequest = null;
+    private RecycleRequest recycleRequest = null;
+    private long specialStartTime = -1;
     private boolean isEnd = false;
 
     public String strFloor(int floor) {
@@ -44,7 +50,36 @@ public class EleQueue {
 
     public synchronized void setMaintRequest(MaintRequest maintRequest) {
         this.maintRequest = maintRequest;
+        this.updateTime();
         this.notifyAll();
+    }
+
+    public synchronized UpdateRequest getUpdateRequest() {
+        return this.updateRequest;
+    }
+
+    public synchronized RecycleRequest getRecycleRequest() {
+        return this.recycleRequest;
+    }
+
+    public synchronized void setRecycleRequest(RecycleRequest recycleRequest) {
+        this.recycleRequest = recycleRequest;
+        this.updateTime();
+        this.notifyAll();
+    }
+
+    public synchronized void setUpdateRequest(UpdateRequest updateRequest) {
+        this.updateRequest = updateRequest;
+        this.updateTime();
+        this.notifyAll();
+    }
+
+    public synchronized void clearRecycleRequest() {
+        this.recycleRequest = null;
+    }
+
+    public synchronized void clearUpdateRequest() {
+        this.updateRequest = null;
     }
 
     public synchronized void setEnd() {
@@ -63,6 +98,10 @@ public class EleQueue {
     public synchronized boolean hasMaintRequest() {
         return this.maintRequest != null;
     }
+
+    public synchronized boolean hasRecycleRequest() { return this.recycleRequest != null; }
+
+    public synchronized boolean hasUpdateRequest() { return this.updateRequest != null; }
 
     public synchronized void clearMaintRequest() {
         this.maintRequest = null;
@@ -88,4 +127,13 @@ public class EleQueue {
 
         return boarded;
     }
+
+    private synchronized void updateTime() {
+        this.specialStartTime = System.currentTimeMillis();
+    }
+
+    public synchronized long getSpecialStartTime() {
+        return this.specialStartTime;
+    }
+
 }

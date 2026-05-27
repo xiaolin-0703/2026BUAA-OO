@@ -3,8 +3,8 @@
 // (powered by Fernflower decompiler)
 //
 
-import com.oocourse.elevator2.ElevatorInput;
-import com.oocourse.elevator2.Request;
+import com.oocourse.elevator3.ElevatorInput;
+import com.oocourse.elevator3.Request;
 import java.io.IOException;
 
 public class InputThread extends Thread {
@@ -21,7 +21,6 @@ public class InputThread extends Thread {
             Request request = elevatorInput.nextRequest();
             if (request == null) {
                 this.mainQueue.setEnd();
-
                 try {
                     elevatorInput.close();
                 } catch (IOException e) {

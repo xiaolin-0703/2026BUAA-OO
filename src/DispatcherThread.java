@@ -3,10 +3,13 @@
 // (powered by Fernflower decompiler)
 //
 
-import com.oocourse.elevator2.MaintRequest;
-import com.oocourse.elevator2.PersonRequest;
-import com.oocourse.elevator2.Request;
-import com.oocourse.elevator2.TimableOutput;
+import com.oocourse.elevator3.Request;
+import com.oocourse.elevator3.PersonRequest;
+import com.oocourse.elevator3.MaintRequest;
+import com.oocourse.elevator3.UpdateRequest;
+import com.oocourse.elevator3.RecycleRequest;
+import com.oocourse.elevator3.TimableOutput;
+
 import java.util.ArrayList;
 
 public class DispatcherThread extends Thread {
@@ -48,6 +51,10 @@ public class DispatcherThread extends Thread {
                     this.takePerson((PersonRequest)request);
                 } else if (request instanceof MaintRequest) {
                     this.takeMaint((MaintRequest)request);
+                } else if (request instanceof UpdateRequest) {
+                    this.takeUpdate((UpdateRequest)request);
+                } else if (request instanceof RecycleRequest) {
+                    this.takeRecycle((RecycleRequest)request);
                 }
             } else {
                 if (this.isFinished()) {
@@ -85,11 +92,26 @@ public class DispatcherThread extends Thread {
         }
     }
 
-    private void setEnd() {
-        for (EleQueue eq : this.eleQueues) {
-            eq.setEnd();
-        }
+    private void takeUpdate(UpdateRequest updateRequest) {
+        int eleId = updateRequest.getElevatorId();
+        ((EleQueue)this.eleQueues.get(eleId - 1)).setUpdateRequest(updateRequest);
+        this.signal();
+    }
 
+    private void takeRecycle(RecycleRequest recycleRequest) {
+        int eleId = recycleRequest.getElevatorId();
+        ((EleQueue)this.eleQueues.get(eleId - 1)).setRecycleRequest(recycleRequest);
+        this.signal();
+    }
+
+    private void setEnd() {
+        for (int i = 0; i < this.eleQueues.size(); i++) {
+            this.eleQueues.get(i).setEnd();
+            Shaft shaft = this.elevators.get(i).getShaft();
+            synchronized (shaft) {
+                shaft.notifyAll();
+            }
+        }
     }
 
     private int chooseBestElevator(PersonRequest pr) {
@@ -118,10 +140,11 @@ public class DispatcherThread extends Thread {
             if (state.getStage() != Stage.NORMAL) {
                 return false;
             }
-
             if (state.getInSize() > 0 ||
                     !((EleQueue)this.eleQueues.get(i)).getwaitPersons().isEmpty() ||
-                    ((EleQueue)this.eleQueues.get(i)).hasMaintRequest()) {
+                    ((EleQueue)this.eleQueues.get(i)).hasMaintRequest() ||
+                    ((EleQueue)this.eleQueues.get(i)).hasUpdateRequest() ||
+                    ((EleQueue)this.eleQueues.get(i)).hasRecycleRequest()) {
                 return false;
             }
         }
@@ -134,4 +157,5 @@ public class DispatcherThread extends Thread {
         ((EleQueue)this.eleQueues.get(id - 1)).setMaintRequest(mr);
         this.signal();
     }
+
 }
