@@ -1,35 +1,37 @@
-import com.oocourse.elevator1.ElevatorInput;
-import com.oocourse.elevator1.PersonRequest;
-import com.oocourse.elevator1.Request;
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
 
+import com.oocourse.elevator2.ElevatorInput;
+import com.oocourse.elevator2.Request;
 import java.io.IOException;
 
 public class InputThread extends Thread {
-    private RequestQueue reqQueue;
+    private InputQueue mainQueue;
 
-    public InputThread(RequestQueue requestQueue) {
-        this.reqQueue = requestQueue;
+    public InputThread(InputQueue requestQueue) {
+        this.mainQueue = requestQueue;
     }
 
-    @Override
     public void run() {
         ElevatorInput elevatorInput = new ElevatorInput(System.in);
+
         while (true) {
             Request request = elevatorInput.nextRequest();
             if (request == null) {
-                reqQueue.setEnd();
-                break;
-            } else {
-                if (request instanceof PersonRequest) {
-                    PersonRequest personRequest = (PersonRequest) request;
-                    reqQueue.addRequest(personRequest);
+                this.mainQueue.setEnd();
+
+                try {
+                    elevatorInput.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+
+                return;
             }
-        }
-        try {
-            elevatorInput.close();
-        }  catch (IOException e) {
-            e.printStackTrace();
+
+            this.mainQueue.addRequest(request);
         }
     }
 }

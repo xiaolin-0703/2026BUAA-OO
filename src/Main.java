@@ -1,25 +1,32 @@
-import com.oocourse.elevator1.TimableOutput;
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
 
+import com.oocourse.elevator2.TimableOutput;
 import java.util.ArrayList;
 
 class Main {
     public static void main(String[] args) {
         TimableOutput.initStartTimestamp();
-        RequestQueue reqQueue = new RequestQueue();
+        InputQueue mainQueue = new InputQueue();
+        ArrayList<EleQueue> eleQueue = new ArrayList();
+        ArrayList<EleThread> elevators = new ArrayList();
 
-        ArrayList<RequestQueue> eleQueue = new ArrayList<RequestQueue>();
-
-        for (int i = 0; i < 6; i++) {
-            eleQueue.add(new RequestQueue());
+        for (int i = 0; i < 6; ++i) {
+            eleQueue.add(new EleQueue());
         }
 
-        for (int i = 0; i < 6; i++) {
-            EleThread elevator = new EleThread(i + 1, eleQueue.get(i));
+        DispatcherThread dispatcher = new DispatcherThread(mainQueue, eleQueue, elevators);
+
+        for (int i = 0; i < 6; ++i) {
+            EleThread elevator = new EleThread(i + 1, (EleQueue)eleQueue.get(i), dispatcher);
+            elevators.add(elevator);
             elevator.start();
         }
-        DispatcherThread dispatcher = new DispatcherThread(reqQueue, eleQueue);
+
         dispatcher.start();
-        InputThread inputThread = new InputThread(reqQueue);
+        InputThread inputThread = new InputThread(mainQueue);
         inputThread.start();
     }
 }
