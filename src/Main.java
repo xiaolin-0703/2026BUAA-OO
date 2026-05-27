@@ -1,25 +1,25 @@
-import java.util.Scanner;
+import com.oocourse.elevator1.TimableOutput;
 
-//TIP 要<b>运行</b>代码，请按 <shortcut actionId="Run"/> 或
-// 点击装订区域中的 <icon src="AllIcons.Actions.Execute"/> 图标。
-public class Main {
+import java.util.ArrayList;
+
+class Main {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
+        TimableOutput.initStartTimestamp();
+        RequestQueue reqQueue = new RequestQueue();
 
-        Process process = new Process(input);
-        Lexer lexer = new Lexer(process.getOutput());
+        ArrayList<RequestQueue> eleQueue = new ArrayList<RequestQueue>();
 
-        Prase prase = new Prase(lexer);
+        for (int i = 0; i < 6; i++) {
+            eleQueue.add(new RequestQueue());
+        }
 
-        ExprFactor expr = prase.praseExpr();
-
-        Poly midResult = expr.toPoly();
-
-        DealResult dealResult = new DealResult(midResult);
-
-        String result = dealResult.getResult();
-
-        System.out.println(result);
+        for (int i = 0; i < 6; i++) {
+            EleThread elevator = new EleThread(i + 1, eleQueue.get(i));
+            elevator.start();
+        }
+        DispatcherThread dispatcher = new DispatcherThread(reqQueue, eleQueue);
+        dispatcher.start();
+        InputThread inputThread = new InputThread(reqQueue);
+        inputThread.start();
     }
 }
